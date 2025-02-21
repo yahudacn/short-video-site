@@ -24,37 +24,59 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            cursor: pointer; /* 添加手型指针，表示可以点击 */
+        }
+        /* 标题和时间显示 */
+        .video-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
         }
     </style>
 </head>
 <body>
     <div class="video-container">
-        <video id="videoPlayer" autoplay loop muted playsinline>
+        <video id="videoPlayer" autoplay loop playsinline>
             <source src="video1.mp4" type="video/mp4">
         </video>
+        <!-- 视频标题和发布时间 -->
+        <div class="video-info" id="videoInfo"></div>
     </div>
 
     <script>
         let videos = [
-            "video1.mp4",
-            "video2.mp4",
-            "video3.mp4"
+            { src: "video1.mp4", title: "短视频 1", date: "2025-02-21" },
+            { src: "video2.mp4", title: "短视频 2", date: "2025-02-20" },
+            { src: "video3.mp4", title: "短视频 3", date: "2025-02-19" }
         ];
-        
+
         let currentIndex = 0;
         let videoElement = document.getElementById("videoPlayer");
+        let videoInfoElement = document.getElementById("videoInfo");
 
-        // 确保浏览器允许播放
-        function ensurePlay() {
-            let playPromise = videoElement.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    console.log("视频播放成功");
-                }).catch(error => {
-                    console.log("播放被阻止，尝试点击屏幕启动", error);
-                });
-            }
+        // 初始化标题和发布时间
+        function updateVideoInfo() {
+            videoInfoElement.innerHTML = `<strong>${videos[currentIndex].title}</strong><br>${videos[currentIndex].date}`;
         }
+        updateVideoInfo();
+
+        // 单击播放/暂停功能
+        videoElement.addEventListener("click", function() {
+            if (videoElement.paused) {
+                videoElement.play();
+            } else {
+                videoElement.pause();
+            }
+        });
+
+        // 取消静音（让用户可以点击开启声音）
+        videoElement.muted = false;
 
         // 鼠标滚轮切换视频
         document.addEventListener("wheel", function(event) {
@@ -81,18 +103,11 @@
             switchVideo();
         });
 
-        // 点击屏幕以确保播放（解决浏览器自动播放问题）
-        document.addEventListener("click", ensurePlay);
-
         // 切换视频
         function switchVideo() {
-            videoElement.src = videos[currentIndex];
-            videoElement.load();  // 确保加载
-            videoElement.play().catch(error => {
-                console.log("播放被阻止", error);
-            });
+            videoElement.src = videos[currentIndex].src;
+            videoElement.load();
+            videoElement.play();
+            updateVideoInfo();
         }
-    </script>
-</body>
-</html>
-
+    </sc
