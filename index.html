@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>以中快拍</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <video id="videoPlayer" autoplay loop muted playsinline>
+            <source src="video1.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <script>
+        let videos = [
+            "video1.mp4",
+            "video2.mp4",
+            "video3.mp4"
+        ];
+        
+        let currentIndex = 0;
+        let videoElement = document.getElementById("videoPlayer");
+
+        // 确保浏览器允许播放
+        function ensurePlay() {
+            let playPromise = videoElement.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log("视频播放成功");
+                }).catch(error => {
+                    console.log("播放被阻止，尝试点击屏幕启动", error);
+                });
+            }
+        }
+
+        // 鼠标滚轮切换视频
+        document.addEventListener("wheel", function(event) {
+            if (event.deltaY > 0) {
+                currentIndex = (currentIndex + 1) % videos.length;
+            } else {
+                currentIndex = (currentIndex - 1 + videos.length) % videos.length;
+            }
+            switchVideo();
+        });
+
+        // 触摸滑动（支持手机）
+        let touchStartY = 0;
+        document.addEventListener("touchstart", function(event) {
+            touchStartY = event.touches[0].clientY;
+        });
+        document.addEventListener("touchend", function(event) {
+            let touchEndY = event.changedTouches[0].clientY;
+            if (touchStartY - touchEndY > 50) {
+                currentIndex = (currentIndex + 1) % videos.length;
+            } else if (touchEndY - touchStartY > 50) {
+                currentIndex = (currentIndex - 1 + videos.length) % videos.length;
+            }
+            switchVideo();
+        });
+
+        // 点击屏幕以确保播放（解决浏览器自动播放问题）
+        document.addEventListener("click", ensurePlay);
+
+        // 切换视频
+        function switchVideo() {
+            videoElement.src = videos[currentIndex];
+            videoElement.load();  // 确保加载
+            videoElement.play().catch(error => {
+                console.log("播放被阻止", error);
+            });
+        }
+    </script>
+</body>
+</html>
+
